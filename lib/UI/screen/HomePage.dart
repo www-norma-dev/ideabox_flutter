@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ideabox/UI/widget/Idea.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 class HomePage extends StatefulWidget {
@@ -8,6 +9,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
+
+  bool like = false;
 
   @override
   Widget build(BuildContext context) {
@@ -169,18 +172,6 @@ class _HomePageState extends State<HomePage> {
                     child: Container(
                       height: 100,
                       alignment: Alignment(0, 0),
-                      color: Colors.green,
-                      child: Column(
-                        children: [],
-                      ),
-                    ),
-                  ),
-                  ResponsiveGridCol(
-                    xs: 6,
-                    md: 3,
-                    child: Container(
-                      height: 100,
-                      alignment: Alignment(0, 0),
                       color: Colors.orange,
                       child: Text("xs : 6 \r\nmd : 3"),
                     ),
@@ -204,6 +195,36 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.blue,
                       child: Text("xs : 6 \r\nmd : 3"),
                     ),
+                  ),
+                  ResponsiveGridCol(
+                    xs: 6,
+                    md: 3,
+                    child: Container(
+                      height: 100,
+                      alignment: Alignment(0, 0),
+                      color: Colors.green,
+                      child: Text("xs : 6 \r\nmd : 3"),
+                    ),
+                  ),
+                  ResponsiveGridCol(
+                    xs: 6,
+                    md: 3,
+                    child: Idea(),
+                  ),
+                  ResponsiveGridCol(
+                    xs: 6,
+                    md: 3,
+                    child: Idea(),
+                  ),
+                  ResponsiveGridCol(
+                    xs: 6,
+                    md: 3,
+                    child: Idea(),
+                  ),
+                  ResponsiveGridCol(
+                    xs: 6,
+                    md: 3,
+                    child: Idea(),
                   ),
                 ],
               ),
