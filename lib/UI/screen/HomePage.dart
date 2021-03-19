@@ -6,6 +6,7 @@ import 'package:ideabox/UI/widget/AppBar.dart';
 import 'package:ideabox/UI/widget/Idea.dart';
 import 'package:ideabox/UI/widget/NavigationDrawer.dart';
 import 'package:ideabox/UI/widget/Tags.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,6 +25,9 @@ class _HomePageState extends State<HomePage> {
   List ideaList = [];
   List<ResponsiveGridCol> ideas = [];
 
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
   getData() async {
     Uri url = Uri.http(Constants.url, "/ideas/");
     final response = await http.get(url);
@@ -31,6 +35,8 @@ class _HomePageState extends State<HomePage> {
       var collection = json.decode(response.body);
 
       setState(() {
+        ideaList.clear();
+        ideas.clear();
         ideaList = collection;
         insetDataInResponsiveGrid();
       });
@@ -77,6 +83,13 @@ class _HomePageState extends State<HomePage> {
     print(value);
   }
 
+  void _onRefresh() async {
+    // monitor network fetch
+    // await Future.delayed(Duration(milliseconds: 1000));
+    await getData();
+    _refreshController.refreshCompleted();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -106,66 +119,73 @@ class _HomePageState extends State<HomePage> {
       drawer: NavigationDrawer(),
       endDrawer: Drawer(),
       backgroundColor: Colors.white,
-      body: Scrollbar(
-        radius: Radius.circular(20),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ResponsiveGridRow(
-                  children: [
-                    ResponsiveGridCol(
-                      lg: 12,
-                      child: Container(
-                        alignment: Alignment(-1, 0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 30),
-                            Text(
-                              "Everything begins \nwith an idea",
-                              style: TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.w600),
-                            ),
-                            SizedBox(height: 30),
-                            Container(
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              child: TextField(
-                                onChanged: onChangeTextFiel,
+      body: SmartRefresher(
+        onRefresh: _onRefresh,
+        enablePullDown: true,
+        enablePullUp: false,
+        controller: _refreshController,
+        child: Scrollbar(
+          radius: Radius.circular(20),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ResponsiveGridRow(
+                    children: [
+                      ResponsiveGridCol(
+                        lg: 12,
+                        child: Container(
+                          alignment: Alignment(-1, 0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 30),
+                              Text(
+                                "Everything begins \nwith an idea",
                                 style: TextStyle(
-                                  fontSize: 16.0,
-                                  height: 1.0,
-                                  color: Colors.black,
+                                    fontSize: 25, fontWeight: FontWeight.w600),
+                              ),
+                              SizedBox(height: 30),
+                              Container(
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(50),
                                 ),
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  labelText: "Title, Category...",
-                                  prefixIcon: SizedBox(width: 10),
-                                  suffixIcon:
-                                      Icon(Icons.search, color: Colors.black),
+                                child: TextField(
+                                  onChanged: onChangeTextFiel,
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    height: 1.0,
+                                    color: Colors.black,
+                                  ),
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    labelText: "Title, Category...",
+                                    prefixIcon: SizedBox(width: 10),
+                                    suffixIcon:
+                                        Icon(Icons.search, color: Colors.black),
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 30),
-                            Tags()
-                          ],
+                              SizedBox(height: 30),
+                              Tags()
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                ResponsiveGridRow(
+                    ],
+                  ),
+                  ResponsiveGridRow(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: ideas),
-              ],
+                    children: ideas,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

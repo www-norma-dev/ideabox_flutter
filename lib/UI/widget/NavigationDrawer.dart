@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ideabox/UI/screen/AddPage.dart';
+import 'package:ideabox/UI/screen/HomePage.dart';
 
 class NavigationDrawer extends StatelessWidget {
   @override
@@ -20,20 +22,36 @@ class NavigationDrawer extends StatelessWidget {
                 ),
               ],
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomePage(),
+                ),
+              );
+            },
           ),
           ListTile(
             title: Row(
               children: [
-                Icon(Icons.all_inclusive_rounded),
+                Icon(
+                  Icons.add,
+                ),
                 SizedBox(width: 20),
                 Text(
-                  'Idea Box',
+                  'ADD NEW IDEA',
                   style: TextStyle(fontSize: 20),
                 ),
               ],
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddPage(),
+                ),
+              );
+            },
           ),
         ],
       ),

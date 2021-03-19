@@ -8,22 +8,56 @@ import 'package:http/http.dart' as http;
 
 import '../../Constent.dart';
 
-class AddPage extends StatefulWidget {
+class EditPage extends StatefulWidget {
+  const EditPage({Key key, this.id}) : super(key: key);
+
   @override
-  _AddPageState createState() => _AddPageState();
+  _EditPageState createState() => _EditPageState();
+
+  final int id;
 }
 
-class _AddPageState extends State<AddPage> {
+class _EditPageState extends State<EditPage> {
   final _formKey = GlobalKey<FormState>();
   GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
+
+  var idea;
+  String getTitle = "";
+  String getDescription = "";
+
+  TextEditingController controllerTitle;
+  TextEditingController controllerDesciption;
+
+  getData() async {
+    Uri url = Uri.http(Constants.url, "/ideas/" + widget.id.toString() + "/");
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      var collection = json.decode(response.body);
+
+      setState(() {
+        idea = collection;
+        getTitle = idea['title'];
+        getDescription = idea['description'];
+
+        title = idea['title'];
+        description = idea['description'];
+
+        controllerDesciption = TextEditingController(text: getDescription);
+        controllerTitle = TextEditingController(text: getTitle);
+
+        print(getTitle);
+        print(getDescription);
+      });
+    }
+  }
 
   String title = "";
   String description = "";
   saveFrom() async {
     if (_formKey.currentState.validate()) {
-      Uri url = Uri.http(Constants.url, "/ideas/");
+      Uri url = Uri.http(Constants.url, "/ideas/" + widget.id.toString() + "/");
 
-      final response = await http.post(
+      final response = await http.put(
         url,
         body: jsonEncode(<String, String>{
           'title': title,
@@ -33,6 +67,7 @@ class _AddPageState extends State<AddPage> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
+
       if (response.statusCode == 200) {
         print(response.statusCode);
       }
@@ -43,7 +78,7 @@ class _AddPageState extends State<AddPage> {
           children: [
             Icon(Icons.info_outline, color: Colors.black),
             Text(
-              "   Idea successfully added",
+              "Idea is successfully modified",
               style: TextStyle(color: Colors.black87),
             ),
           ],
@@ -51,6 +86,12 @@ class _AddPageState extends State<AddPage> {
         duration: Duration(seconds: 3),
       ));
     }
+  }
+
+  @override
+  void initState() {
+    getData();
+    super.initState();
   }
 
   @override
@@ -67,20 +108,49 @@ class _AddPageState extends State<AddPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 60),
+                SizedBox(height: 40),
                 Text(
-                  'ADD NEW IDEA',
+                  'EDIT IDEA',
                   style: TextStyle(
                       color: Colors.grey[700],
                       fontSize: 16,
                       fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 40),
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(8)),
+                  padding: EdgeInsets.all(3),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.network(
+                      "https://source.unsplash.com/random",
+                      height: MediaQuery.of(context).size.height / 4,
+                      width: MediaQuery.of(context).size.width / 2,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, progress) {
+                        return progress == null
+                            ? child
+                            : Container(
+                                height: MediaQuery.of(context).size.height / 4,
+                                width: MediaQuery.of(context).size.width / 2,
+                                padding: EdgeInsets.all(40),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: TextFormField(
-                    onChanged: (val) => setState(() => title = val),
+                    controller: controllerTitle,
                     onSaved: (val) => setState(() => title = val),
+                    onChanged: (val) => setState(() => title = val),
                     validator: (val) {
                       if (val.isEmpty) {
                         return "Please enter some Text";
@@ -97,8 +167,9 @@ class _AddPageState extends State<AddPage> {
                 Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: TextFormField(
+                    controller: controllerDesciption,
+                    onSaved: (val) => setState(() => {description = val}),
                     onChanged: (val) => setState(() => description = val),
-                    onSaved: (val) => setState(() => description = val),
                     validator: (val) {
                       if (val.isEmpty) {
                         return "Please enter some Text";

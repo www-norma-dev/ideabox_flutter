@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ideabox/UI/screen/DetailPage.dart';
 import 'package:http/http.dart' as http;
+import 'package:ideabox/UI/screen/EditPage.dart';
 
 import '../../Constent.dart';
 
@@ -22,19 +23,29 @@ class Idea extends StatefulWidget {
 
 class _IdeaState extends State<Idea> {
   bool like = false;
+  bool delete = false;
 
   deleteIdea() async {
     widget.drawerKey
       ..currentState.showSnackBar(SnackBar(
-        content: Text('Assign a GlobalKey to the Scaffold'),
+        backgroundColor: Colors.yellow[600],
+        content: Row(
+          children: [
+            Icon(Icons.info_outline, color: Colors.black),
+            Text(
+              widget.title + " successfully delete",
+              style: TextStyle(color: Colors.black87),
+            ),
+          ],
+        ),
         duration: Duration(seconds: 3),
       ));
 
-    // Uri url = Uri.http(Constants.url, "/ideas/" + widget.id.toString() + "/");
-    // final response = await http.delete(url);
-    // if (response.statusCode == 200) {
-    //   setState(() {});
-    // }
+    Uri url = Uri.http(Constants.url, "/ideas/" + widget.id.toString() + "/");
+    final response = await http.delete(url);
+    if (response.statusCode == 200) {
+      setState(() {});
+    }
   }
 
   @override
@@ -80,8 +91,9 @@ class _IdeaState extends State<Idea> {
                                     MediaQuery.of(context).size.height / 4.5,
                                 width: MediaQuery.of(context).size.width,
                                 padding: EdgeInsets.all(40),
-                                child:
-                                    Center(child: CircularProgressIndicator()),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               );
                       },
                     ),
@@ -100,13 +112,8 @@ class _IdeaState extends State<Idea> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0, right: 8),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text(
-                          widget.description,
-                          style: TextStyle(
-                              fontSize: 13, fontWeight: FontWeight.w300),
-                        ),
                         Row(
                           children: [
                             Text(
@@ -121,6 +128,14 @@ class _IdeaState extends State<Idea> {
                           ],
                         )
                       ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      widget.description,
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w300),
                     ),
                   ),
                   Row(
@@ -143,7 +158,12 @@ class _IdeaState extends State<Idea> {
                             alignment: Alignment.centerRight,
                             icon: Icon(Icons.edit, color: Colors.yellow[700]),
                             onPressed: () {
-                              print('lsdfjdsklf');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditPage(id: widget.id),
+                                ),
+                              );
                             },
                           ),
                           IconButton(
