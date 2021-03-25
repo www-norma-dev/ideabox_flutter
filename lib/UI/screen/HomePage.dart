@@ -29,22 +29,24 @@ class _HomePageState extends State<HomePage> {
       RefreshController(initialRefresh: false);
 
   getData() async {
-    Uri url = Uri.http(Constants.url, "/ideas/");
+    Uri url = Uri.http(Constants.url, "/idea/");
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var collection = json.decode(response.body);
 
+      print(collection);
+
       setState(() {
         ideaList.clear();
         ideas.clear();
-        ideaList = collection;
+        ideaList = collection["results"];
         insetDataInResponsiveGrid();
       });
     }
   }
 
   getDataSearch(query) async {
-    Uri url = Uri.http(Constants.url, "/ideas/");
+    Uri url = Uri.http(Constants.url, "/idea/");
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var collection = json.decode(response.body);
@@ -73,6 +75,7 @@ class _HomePageState extends State<HomePage> {
           title: ideaList[i]["title"],
           description: ideaList[i]["description"],
           drawerKey: _drawerKey,
+          imgUrl: ideaList[i]["files"],
         ),
       ));
     }

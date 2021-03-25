@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:ideabox/UI/widget/AppBar.dart';
 import 'package:ideabox/UI/widget/NavigationDrawer.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 import '../../Constent.dart';
 
@@ -19,9 +20,53 @@ class _AddPageState extends State<AddPage> {
 
   String title = "";
   String description = "";
+
+  File _image;
+  final picker = ImagePicker();
+
+  Future getImage({String from}) async {
+    //Example for GetX to Close the Dialog box
+    Get.back();
+
+    final pickedFile = await picker.getImage(
+        source: from == "camera" ? ImageSource.camera : ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  showModal() {
+    showModalBottomSheet<void>(
+      useRootNavigator: true,
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 150,
+          child: ListView(
+            children: [
+              ListTile(
+                  leading: Icon(Icons.camera_alt),
+                  title: Text('From Camera'),
+                  onTap: () => getImage(from: "camera")),
+              ListTile(
+                  leading: Icon(Icons.camera),
+                  title: Text('From Galery'),
+                  onTap: () => getImage(from: "galery")),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   saveFrom() async {
     if (_formKey.currentState.validate()) {
-      Uri url = Uri.http(Constants.url, "/ideas/");
+      Uri url = Uri.http(Constants.url, "/idea/");
 
       final response = await http.post(
         url,
@@ -33,6 +78,7 @@ class _AddPageState extends State<AddPage> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
+
       if (response.statusCode == 200) {
         print(response.statusCode);
       }
@@ -76,6 +122,70 @@ class _AddPageState extends State<AddPage> {
                       fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 40),
+                Stack(
+                  overflow: Overflow.visible,
+                  children: [
+                    Positioned(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20.0),
+                        child: _image != null
+                            ? Image.file(
+                                _image,
+                                height: MediaQuery.of(context).size.height / 4,
+                                width: MediaQuery.of(context).size.width / 2,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.network(
+                                'https://aeroclub-issoire.fr/wp-content/uploads/2020/05/image-not-found.jpg',
+                                height: MediaQuery.of(context).size.height / 4,
+                                width: MediaQuery.of(context).size.width / 2,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, progress) {
+                                  return progress == null
+                                      ? child
+                                      : Container(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              4,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              2,
+                                          padding: EdgeInsets.all(40),
+                                          child: Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
+                                },
+                              ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: -15,
+                      right: -15,
+                      child: Container(
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          border:
+                              Border.all(color: Colors.grey[300], width: 0.5),
+                        ),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.indigo[300],
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.photo_camera_outlined,
+                              color: Colors.white,
+                            ),
+                            onPressed: showModal,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: TextFormField(

@@ -9,7 +9,13 @@ import 'package:ideabox/UI/screen/EditPage.dart';
 import '../../Constent.dart';
 
 class Idea extends StatefulWidget {
-  const Idea({Key key, this.id, this.title, this.description, this.drawerKey})
+  const Idea(
+      {Key key,
+      this.id,
+      this.title,
+      this.description,
+      this.drawerKey,
+      this.imgUrl})
       : super(key: key);
 
   @override
@@ -19,6 +25,7 @@ class Idea extends StatefulWidget {
   final String title;
   final String description;
   final GlobalKey<ScaffoldState> drawerKey;
+  final String imgUrl;
 }
 
 class _IdeaState extends State<Idea> {
@@ -41,7 +48,7 @@ class _IdeaState extends State<Idea> {
         duration: Duration(seconds: 3),
       ));
 
-    Uri url = Uri.http(Constants.url, "/ideas/" + widget.id.toString() + "/");
+    Uri url = Uri.http(Constants.url, "/idea/" + widget.id.toString() + "/");
     final response = await http.delete(url);
     if (response.statusCode == 200) {
       setState(() {});
@@ -79,7 +86,9 @@ class _IdeaState extends State<Idea> {
                       topLeft: Radius.circular(9),
                     ),
                     child: Image.network(
-                      'https://source.unsplash.com/random',
+                      widget.imgUrl != null
+                          ? widget.imgUrl
+                          : "https://source.unsplash.com/random",
                       height: MediaQuery.of(context).size.height / 4.5,
                       width: MediaQuery.of(context).size.width,
                       fit: BoxFit.cover,

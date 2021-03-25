@@ -20,9 +20,10 @@ class _DetailPageState extends State<DetailPage> {
   var idea;
   String title = "";
   String description = "";
+  String imgUrl = "";
 
   getData() async {
-    Uri url = Uri.http(Constants.url, "/ideas/" + widget.id.toString() + "/");
+    Uri url = Uri.http(Constants.url, "/idea/" + widget.id.toString() + "/");
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var collection = json.decode(response.body);
@@ -31,6 +32,7 @@ class _DetailPageState extends State<DetailPage> {
         idea = collection;
         title = idea['title'];
         description = idea['description'];
+        imgUrl = idea['files'];
       });
     }
   }
@@ -52,7 +54,7 @@ class _DetailPageState extends State<DetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.network(
-              "https://source.unsplash.com/random",
+              imgUrl != "" ? imgUrl : "https://source.unsplash.com/random",
               height: MediaQuery.of(context).size.height / 2,
               width: MediaQuery.of(context).size.width,
               fit: BoxFit.cover,

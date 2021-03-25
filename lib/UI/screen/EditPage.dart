@@ -29,7 +29,7 @@ class _EditPageState extends State<EditPage> {
   TextEditingController controllerDesciption;
 
   getData() async {
-    Uri url = Uri.http(Constants.url, "/ideas/" + widget.id.toString() + "/");
+    Uri url = Uri.http(Constants.url, "/idea/" + widget.id.toString() + "/");
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var collection = json.decode(response.body);
@@ -55,7 +55,7 @@ class _EditPageState extends State<EditPage> {
   String description = "";
   saveFrom() async {
     if (_formKey.currentState.validate()) {
-      Uri url = Uri.http(Constants.url, "/ideas/" + widget.id.toString() + "/");
+      Uri url = Uri.http(Constants.url, "/idea/" + widget.id.toString() + "/");
 
       final response = await http.put(
         url,
