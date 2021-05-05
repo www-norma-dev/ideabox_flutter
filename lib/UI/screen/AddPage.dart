@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ideabox/UI/widget/AppBar.dart';
 import 'package:ideabox/UI/widget/NavigationDrawer.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 import '../../Constent.dart';
 
@@ -19,6 +20,22 @@ class _AddPageState extends State<AddPage> {
 
   String title = "";
   String description = "";
+
+  File _image;
+  final picker = ImagePicker();
+
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
   saveFrom() async {
     if (_formKey.currentState.validate()) {
       Uri url = Uri.http(Constants.url, "/ideas/");
@@ -50,6 +67,8 @@ class _AddPageState extends State<AddPage> {
         ),
         duration: Duration(seconds: 3),
       ));
+      // return to first page
+      Navigator.pop(context);
     }
   }
 
@@ -75,6 +94,30 @@ class _AddPageState extends State<AddPage> {
                       fontSize: 16,
                       fontWeight: FontWeight.bold),
                 ),
+                Row(children: [
+                  GestureDetector(
+                    onTap: () {
+                      getImage();
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      height: 100,
+                      width: MediaQuery.of(context).size.width / 2,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.blueAccent),
+                        ),
+                        child: Icon(Icons.photo),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 100,
+                    color: Colors.blue,
+                    width: MediaQuery.of(context).size.width / 2,
+                  ),
+                ]),
                 SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.all(15.0),
